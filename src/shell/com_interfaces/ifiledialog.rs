@@ -176,12 +176,14 @@ pub trait shell_IFileDialog: shell_IModalWindow {
 	/// # w::HrResult::Ok(())
 	/// ```
 	fn SetFileTypes<S: AsRef<str>>(&self, filter_spec: &[(S, S)]) -> HrResult<()> {
-		let mut native_specs: Vec<COMDLG_FILTERSPEC> = Vec::with_capacity(filter_spec.len());
+		let mut names: Vec<WString> = filter_spec.iter().map(|(n, _)| WString::from_str(n.as_ref())).collect();
+		let mut specs: Vec<WString> = filter_spec.iter().map(|(_, s)| WString::from_str(s.as_ref())).collect();
 
-		for (name, spec) in filter_spec {
+		let mut native_specs: Vec<COMDLG_FILTERSPEC> = Vec::with_capacity(filter_spec.len());
+		for i in 0..filter_spec.len() {
 			let mut native = COMDLG_FILTERSPEC::default();
-			native.set_pszName(Some(&WString::from_str(name.as_ref())));
-			native.set_pszSpec(Some(&WString::from_str(spec.as_ref())));
+			native.set_pszName(Some(&mut names[i]));
+			native.set_pszSpec(Some(&mut specs[i]));
 			native_specs.push(native);
 		}
 
@@ -189,7 +191,7 @@ pub trait shell_IFileDialog: shell_IModalWindow {
 			(vt::<IFileDialogVT>(self).SetFileTypes)(
 				self.ptr(),
 				native_specs.len() as _,
-				native_specs.as_ptr(),
+				native_specs.as_ptr() as *const std::ffi::c_void,
 			)
 		})
 	}
