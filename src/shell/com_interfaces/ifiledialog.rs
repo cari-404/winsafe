@@ -200,9 +200,9 @@ pub trait shell_IFileDialog: shell_IModalWindow {
 			})
 			.collect();
 
-		let native_ptr = filters
+		let native_slice = filters
 			.iter()
-			.map(|f| &f.native as *const COMDLG_FILTERSPEC)
+			.map(|f| f.native)
 			.collect::<Vec<_>>();
 
 		ok_to_hrresult(unsafe {
