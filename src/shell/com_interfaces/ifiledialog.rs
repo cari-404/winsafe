@@ -196,7 +196,7 @@ pub trait shell_IFileDialog: shell_IModalWindow {
 			(vt::<IFileDialogVT>(self).SetFileTypes)(
 				self.ptr(),
 				native_specs.len() as _,
-				native_specs.as_ptr(),
+				native_specs.as_ptr() as *const std::ffi::c_void,
 			)
 		})
 	}
