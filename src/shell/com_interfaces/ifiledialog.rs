@@ -189,8 +189,8 @@ pub trait shell_IFileDialog: shell_IModalWindow {
 				let mut wspec = WString::from_str(spec.as_ref());
 
 				let mut native = COMDLG_FILTERSPEC::default();
-				native.set_pszName(Some(&mut wname));
-				native.set_pszSpec(Some(&mut wspec));
+				native.set_pszName(Some(&mut wname.clone()));
+				native.set_pszSpec(Some(&mut wspec.clone()));
 
 				FilterItem {
 					name: wname,
