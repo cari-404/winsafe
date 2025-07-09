@@ -200,16 +200,14 @@ pub trait shell_IFileDialog: shell_IModalWindow {
 			})
 			.collect();
 
-		let native_slice = filters
-			.iter()
-			.map(|f| f.native)
-			.collect::<Vec<_>>();
+		let native_slice: Vec<COMDLG_FILTERSPEC> =
+			filters.iter().map(|f| f.native).collect();
 
 		ok_to_hrresult(unsafe {
 			(vt::<IFileDialogVT>(self).SetFileTypes)(
 				self.ptr(),
-				filter_spec.len() as _,
-				native_ptr.as_ptr(),
+				native_slice.len() as _,
+				native_slice.as_ptr() as _,
 			)
 		})
 	}
