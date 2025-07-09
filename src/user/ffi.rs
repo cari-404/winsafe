@@ -9,6 +9,13 @@ extern_sys! { "comdlg32";
 extern_sys! { "user32";
 	GetWindowLongW(HANDLE, i32) -> isize
 	SetWindowLongW(HANDLE, i32, isize) -> isize
+	GetClassLongW(HANDLE, i32) -> i32
+}
+
+#[cfg(target_pointer_width = "32")]
+#[inline(always)]
+pub unsafe fn GetClassLongPtrW(hwnd: HANDLE, index: i32) -> usize {
+    GetClassLongW(hwnd, index) as usize
 }
 
 #[cfg(target_pointer_width = "64")]
@@ -16,6 +23,7 @@ extern_sys! { "user32";
 	GetWindowLongPtrW(HANDLE, i32) -> isize
 	SetWindowLongPtrW(HANDLE, i32, isize) -> isize
 	InSendMessageEx() -> u32
+	GetClassLongPtrW(HANDLE, i32) -> usize
 }
 
 extern_sys! { "user32";
@@ -96,7 +104,6 @@ extern_sys! { "user32";
 	GetCaretBlinkTime() -> u32
 	GetCaretPos(PVOID) -> BOOL
 	GetClassInfoExW(HANDLE, PCSTR, PVOID) -> BOOL
-	GetClassLongPtr(HANDLE, i32) -> usize
 	GetClassNameW(HANDLE, PSTR, i32) -> i32
 	GetClientRect(HANDLE, PVOID) -> BOOL
 	GetClipboardData(u32) -> HANDLE

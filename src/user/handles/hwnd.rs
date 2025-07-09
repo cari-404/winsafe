@@ -437,7 +437,7 @@ impl HWND {
 	/// [`HWND::is_dialog`](crate::HWND::is_dialog) method.
 	#[must_use]
 	pub fn GetClassLongPtr(&self, index: co::GCLP) -> usize {
-		unsafe { ffi::GetClassLongPtr(self.ptr(), index.raw()) }
+		unsafe { ffi::GetClassLongPtrW(self.ptr(), index.raw()) }
 	}
 
 	/// [`GetClassName`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getclassnamew)
