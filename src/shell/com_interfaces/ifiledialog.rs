@@ -176,21 +176,33 @@ pub trait shell_IFileDialog: shell_IModalWindow {
 	/// # w::HrResult::Ok(())
 	/// ```
 	fn SetFileTypes<S: AsRef<str>>(&self, filter_spec: &[(S, S)]) -> HrResult<()> {
-		let mut names: Vec<WString> = Vec::new();
-		let mut specs: Vec<WString> = Vec::new();
-		let mut native_specs: Vec<COMDLG_FILTERSPEC> = Vec::new();
+		struct FilterItem<'a> {
+			name: WString,
+			spec: WString,
+			native: COMDLG_FILTERSPEC<'a, 'a>,
+		}
+
+		let mut items: Vec<FilterItem> = Vec::new();
 
 		for (name, spec) in filter_spec {
-			names.push(WString::from_str(name.as_ref()));
-			specs.push(WString::from_str(spec.as_ref()));
+			let mut wname = WString::from_str(name.as_ref());
+			let mut wspec = WString::from_str(spec.as_ref());
+
+			let mut native = COMDLG_FILTERSPEC::default();
+			native.set_pszName(Some(&mut wname));
+			native.set_pszSpec(Some(&mut wspec));
+
+			items.push(FilterItem {
+				name: wname,
+				spec: wspec,
+				native,
+			});
 		}
 
-		for (name, spec) in names.iter_mut().zip(specs.iter_mut()) {
-			let mut native = COMDLG_FILTERSPEC::default();
-			native.set_pszName(Some(name));
-			native.set_pszSpec(Some(spec));
-			native_specs.push(native);
-		}
+		let native_specs = items
+			.iter()
+			.map(|item| item.native)
+			.collect::<Vec<COMDLG_FILTERSPEC>>();
 
 		ok_to_hrresult(unsafe {
 			(vt::<IFileDialogVT>(self).SetFileTypes)(
