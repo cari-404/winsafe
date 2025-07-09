@@ -96,7 +96,7 @@ extern_sys! { "user32";
 	GetCaretBlinkTime() -> u32
 	GetCaretPos(PVOID) -> BOOL
 	GetClassInfoExW(HANDLE, PCSTR, PVOID) -> BOOL
-	GetClassLongPtrW(HANDLE, i32) -> usize
+	GetClassLongPtr(HANDLE, i32) -> usize
 	GetClassNameW(HANDLE, PSTR, i32) -> i32
 	GetClientRect(HANDLE, PVOID) -> BOOL
 	GetClipboardData(u32) -> HANDLE
