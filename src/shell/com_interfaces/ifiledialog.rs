@@ -176,16 +176,35 @@ pub trait shell_IFileDialog: shell_IModalWindow {
 	/// # w::HrResult::Ok(())
 	/// ```
 	fn SetFileTypes<S: AsRef<str>>(&self, filter_spec: &[(S, S)]) -> HrResult<()> {
-		let mut names: Vec<WString> = filter_spec.iter().map(|(n, _)| WString::from_str(n.as_ref())).collect();
-		let mut specs: Vec<WString> = filter_spec.iter().map(|(_, s)| WString::from_str(s.as_ref())).collect();
-
-		let mut native_specs: Vec<COMDLG_FILTERSPEC> = Vec::with_capacity(filter_spec.len());
-		for i in 0..filter_spec.len() {
-			let mut native = COMDLG_FILTERSPEC::default();
-			native.set_pszName(Some(&mut names[i]));
-			native.set_pszSpec(Some(&mut specs[i]));
-			native_specs.push(native);
+		struct FilterSpecHolder {
+			name: WString,
+			spec: WString,
+			native: COMDLG_FILTERSPEC<'static, 'static>,
 		}
+
+		let mut holders: Vec<FilterSpecHolder> = Vec::with_capacity(filter_spec.len());
+
+		for (name, spec) in filter_spec {
+			let mut name_ws = WString::from_str(name.as_ref());
+			let mut spec_ws = WString::from_str(spec.as_ref());
+
+			// Use raw pointers to extend lifetime for COMDLG_FILTERSPEC
+			let name_ptr: *mut WString = &mut name_ws;
+			let spec_ptr: *mut WString = &mut spec_ws;
+
+			let mut native = COMDLG_FILTERSPEC::default();
+			// SAFETY: We guarantee the WString lives as long as native
+			native.set_pszName(Some(unsafe { &mut *name_ptr }));
+			native.set_pszSpec(Some(unsafe { &mut *spec_ptr }));
+
+			holders.push(FilterSpecHolder {
+				name: name_ws,
+				spec: spec_ws,
+				native,
+			});
+		}
+
+		let native_specs: Vec<_> = holders.iter().map(|h| &h.native).collect();
 
 		ok_to_hrresult(unsafe {
 			(vt::<IFileDialogVT>(self).SetFileTypes)(
