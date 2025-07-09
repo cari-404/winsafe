@@ -176,28 +176,40 @@ pub trait shell_IFileDialog: shell_IModalWindow {
 	/// # w::HrResult::Ok(())
 	/// ```
 	fn SetFileTypes<S: AsRef<str>>(&self, filter_spec: &[(S, S)]) -> HrResult<()> {
-		let (mut strs_buf, mut com_dlgs): (Vec<_>, Vec<_>) = filter_spec
+		struct FilterItem {
+			name: WString,
+			spec: WString,
+			native: COMDLG_FILTERSPEC,
+		}
+
+		let mut filters: Vec<FilterItem> = filter_spec
 			.iter()
 			.map(|(name, spec)| {
 				let wname = WString::from_str(name.as_ref());
 				let wspec = WString::from_str(spec.as_ref());
-				((wname, wspec), COMDLG_FILTERSPEC::default())
-			})
-			.unzip();
 
-		strs_buf
-			.iter_mut()
-			.zip(com_dlgs.iter_mut())
-			.for_each(|((name, spec), com_dlg)| {
-				com_dlg.set_pszName(Some(name));
-				com_dlg.set_pszSpec(Some(spec));
-			});
+				let mut native = COMDLG_FILTERSPEC::default();
+				native.set_pszName(Some(&wname));
+				native.set_pszSpec(Some(&wspec));
+
+				FilterItem {
+					name: wname,
+					spec: wspec,
+					native,
+				}
+			})
+			.collect();
+
+		let native_ptr = filters
+			.iter()
+			.map(|f| &f.native as *const COMDLG_FILTERSPEC)
+			.collect::<Vec<_>>();
 
 		ok_to_hrresult(unsafe {
 			(vt::<IFileDialogVT>(self).SetFileTypes)(
 				self.ptr(),
 				filter_spec.len() as _,
-				com_dlgs.as_ptr() as _,
+				native_ptr.as_ptr(),
 			)
 		})
 	}
