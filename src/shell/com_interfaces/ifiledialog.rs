@@ -176,21 +176,21 @@ pub trait shell_IFileDialog: shell_IModalWindow {
 	/// # w::HrResult::Ok(())
 	/// ```
 	fn SetFileTypes<S: AsRef<str>>(&self, filter_spec: &[(S, S)]) -> HrResult<()> {
-		struct FilterItem {
+		struct FilterItem<'a> {
 			name: WString,
 			spec: WString,
-			native: COMDLG_FILTERSPEC,
+			native: COMDLG_FILTERSPEC<'a, 'a>,
 		}
 
 		let mut filters: Vec<FilterItem> = filter_spec
 			.iter()
 			.map(|(name, spec)| {
-				let wname = WString::from_str(name.as_ref());
-				let wspec = WString::from_str(spec.as_ref());
+				let mut wname = WString::from_str(name.as_ref());
+				let mut wspec = WString::from_str(spec.as_ref());
 
 				let mut native = COMDLG_FILTERSPEC::default();
-				native.set_pszName(Some(&wname));
-				native.set_pszSpec(Some(&wspec));
+				native.set_pszName(Some(&mut wname));
+				native.set_pszSpec(Some(&mut wspec));
 
 				FilterItem {
 					name: wname,
