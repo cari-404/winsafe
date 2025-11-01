@@ -36,6 +36,7 @@ impl HWND {
 	/// whether the window was created from a dialog resource.
 	#[must_use]
 	pub fn is_dialog(&self) -> bool {
+		println!("test dialog")
 		self.GetClassLongPtr(co::GCLP::ATOM) as u16 == WC_DIALOG
 	}
 
