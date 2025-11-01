@@ -15,7 +15,11 @@ extern_sys! { "user32";
 #[cfg(target_pointer_width = "32")]
 #[inline(always)]
 pub unsafe fn GetClassLongPtrW(hwnd: HANDLE, index: i32) -> usize {
-    GetClassLongW(hwnd, index) as usize
+	println!("test");
+	println!("{}", index);
+    let a = GetClassLongW(hwnd, index) as usize
+	println!("{}", a);
+	a
 }
 
 #[cfg(target_pointer_width = "64")]
