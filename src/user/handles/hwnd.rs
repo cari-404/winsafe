@@ -443,6 +443,7 @@ impl HWND {
 	/// [`HWND::is_dialog`](crate::HWND::is_dialog) method.
 	#[must_use]
 	pub fn GetClassLongPtr(&self, index: co::GCLP) -> usize {
+		println!("test hwnd");
 		unsafe { ffi::GetClassLongPtrW(self.ptr(), index.raw()) }
 	}
 
