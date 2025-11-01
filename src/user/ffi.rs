@@ -17,7 +17,7 @@ extern_sys! { "user32";
 pub unsafe fn GetClassLongPtrW(hwnd: HANDLE, index: i32) -> usize {
 	println!("test");
 	println!("{}", index);
-    let a = GetClassLongW(hwnd, index) as usize
+    let a = GetClassLongW(hwnd, index) as usize;
 	println!("{}", a);
 	a
 }
