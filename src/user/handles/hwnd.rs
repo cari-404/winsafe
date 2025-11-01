@@ -444,7 +444,7 @@ impl HWND {
 	#[must_use]
 	pub fn GetClassLongPtr(&self, index: co::GCLP) -> usize {
 		println!("test hwnd");
-		println!("{}", index)
+		println!("{}", index);
 		unsafe { ffi::GetClassLongPtrW(self.ptr(), index.raw()) }
 	}
 
