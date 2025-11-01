@@ -99,6 +99,7 @@ pub fn CoCreateInstance<T>(
 where
 	T: ole_IUnknown,
 {
+	println!("test CoCreateInstance");
 	let mut queried = unsafe { T::null() };
 	HrRet(unsafe {
 		ffi::CoCreateInstance(
