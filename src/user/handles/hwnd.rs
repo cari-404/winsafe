@@ -36,7 +36,6 @@ impl HWND {
 	/// whether the window was created from a dialog resource.
 	#[must_use]
 	pub fn is_dialog(&self) -> bool {
-		println!("test dialog");
 		self.GetClassLongPtr(co::GCLP::ATOM) as u16 == WC_DIALOG
 	}
 
@@ -444,8 +443,6 @@ impl HWND {
 	/// [`HWND::is_dialog`](crate::HWND::is_dialog) method.
 	#[must_use]
 	pub fn GetClassLongPtr(&self, index: co::GCLP) -> usize {
-		println!("test hwnd");
-		println!("{}", index);
 		unsafe { ffi::GetClassLongPtrW(self.ptr(), index.raw()) }
 	}
 
