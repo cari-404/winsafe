@@ -116,6 +116,16 @@ pub unsafe fn BroadcastSystemMessage<M: MsgSend>(
 	}
 }
 
+/// [`CallNextHookEx`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-callnexthookex)
+/// function.
+///
+/// This function originally takes a [`HHOOK`](crate::HHOOK) as its first
+/// parameter, but since it's ignored, it has been ommited here. Thus,
+/// `CallNextHookEx` is a free function instead of a `HHOOK` method.
+pub fn CallNextHookEx(code: i32, wparam: usize, lparam: isize) -> isize {
+	unsafe { ffi::CallNextHookEx(std::ptr::null_mut(), code, wparam, lparam) }
+}
+
 /// [`ChangeDisplaySettings`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-changedisplaysettingsw)
 /// function.
 pub fn ChangeDisplaySettings(
@@ -792,7 +802,7 @@ where
 /// function.
 #[must_use]
 pub fn PtInRect(rc: RECT, pt: POINT) -> bool {
-	unsafe { ffi::PtInRect(pcvoid(&rc), pt.x, pt.y) != 0 }
+	unsafe { ffi::PtInRect(pcvoid(&rc), pt.into()) != 0 }
 }
 
 /// [`RegisterClassEx`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-registerclassexw)
